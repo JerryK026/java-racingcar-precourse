@@ -7,11 +7,15 @@ public class GameMachine {
     private static final int LIMIT = 1_000_000;
     private int tolerance = 0;
 
+    public interface UnCheckedCallable<V> {
+        V call() throws RuntimeException;
+    }
+
     public void run() {
-        Cars cars = new Cars(readCarNames());
+        Cars cars = new Cars(readTemplate(() -> inputView.readCarNames()));
         play(
                 cars,
-                readCoins()
+                readTemplate(() -> inputView.readCoins())
         );
         outputView.printWinners(cars.findWinners());
     }
@@ -25,24 +29,13 @@ public class GameMachine {
         }
     }
 
-    // todo: read 부분 추상화하기
-    private CarNames readCarNames() {
+    private <T> T readTemplate(UnCheckedCallable<T> function) {
         try {
-            return inputView.readCarNames();
+            return function.call();
         } catch (IllegalArgumentException e) {
             outputView.printError(e.getMessage());
             plusGameTimes();
-            return inputView.readCarNames();
-        }
-    }
-
-    private Coin readCoins() {
-        try {
-            return inputView.readCoins();
-        } catch (IllegalArgumentException e) {
-            outputView.printError(e.getMessage());
-            plusGameTimes();
-            return inputView.readCoins();
+            return function.call();
         }
     }
 
