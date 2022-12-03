@@ -3,6 +3,8 @@ package racingcar;
 import java.util.stream.IntStream;
 
 public class Car {
+    private static final int MOVABLE_BOUND = 4;
+
     private final String name;
     private int position = 0;
     private NumberGenerator numberGenerator;
@@ -29,7 +31,7 @@ public class Car {
     }
 
     private boolean isMovable() {
-        if (numberGenerator.generate() < 4) {
+        if (numberGenerator.generate() < MOVABLE_BOUND) {
             return false;
         }
 
